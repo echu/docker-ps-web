@@ -1,0 +1,53 @@
+<!doctype html>
+<html>
+  <head>
+    <title>Containers!</title>
+    <style>
+      * { margin: 0; padding: 0; box-sizing: border-box; }
+      body { font: 13px Helvetica, Arial; }
+      form { background: #000; padding: 3px; position: fixed; bottom: 0; width: 100%; }
+      form input { border: 0; padding: 10px; width: 90%; margin-right: .5%; }
+      form button { width: 9%; background: rgb(130, 224, 255); border: none; padding: 10px; }
+      #containers { list-style-type: none; margin: 0; padding: 0; }
+      #containers tr { padding: 5px 10px; }
+      #containers tr:nth-child(odd) { background: #eee; }
+    </style>
+  </head>
+  <body>
+      <table id="containers">
+          <thead>
+              <tr>
+                <th>Names</th>
+                <th>Image</th>
+                <th>Created</th>
+                <th>Status</th>
+              </tr>
+          </thead>
+          <tbody>
+          </tbody>
+      </table>
+    <script src="/reconnecting-websocket.min.js"></script>
+    <script src="http://code.jquery.com/jquery-1.11.1.js"></script>
+<script>
+        var socket = new ReconnectingWebSocket("ws://" + location.host + "/ws/containers");
+
+        socket.onopen = function() {
+            console.log("opened connection")
+            socket.onmessage = function(msg) {
+                $('#containers > tbody').empty();
+                console.log(msg.data);
+                var data = JSON.parse(msg.data);
+                for (var i = 0; i < data.length; i++) {
+                    var container = data[i];
+                    console.log(container);
+                    $('#containers > tbody').append('<tr><td>' +
+                            '<a href=/' + container['Id'] + '>' + container['Names'][0] + '</a></td><td>' +
+                            container['Image'] + '</td><td>' +
+                            new Date(parseInt(container['Created'])*1000) + '</td><td>' +
+                            container['Status'] + '</td></tr>');
+                }
+            }
+        };
+</script>
+  </body>
+</html>
